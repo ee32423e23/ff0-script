@@ -1,0 +1,98 @@
+FF0 supports four types of data: number, string, function and list.
+
+FF0 supports built-in variable "true" and "false" , it is not a good idea to edit it, for example:
+	true = 0
+	false = 123
+is available.
+
+A variable should be declared before it is used, for example:
+	a = 1
+	b = a + 1
+is available, and
+	a = 3
+	b = c
+	c = 10
+is invaliable.
+
+Nested-list is available, for example:
+	a = {}
+	b = {1, 2, 3}
+	c = {{1, 2}, {3, 4}}
+FF0 can hold different types of data in one list, for example:
+	a = {"Hello", {1, 2, 3}, -4, -5}
+
+To access the elements in the list, you are supposed to use operator "[]", for example:
+	a = {1, 2, 3}
+	b = a[2]
+And you can use a string as a subscript (just as map<string, Value> in C++ STL).
+	a = {}
+	a["example"] = 10
+	a["example_2"] = 10
+Attention, FF0 does not support "point-grammar" in JavaScript. for example:
+	a = {}
+	a["error"] = 123
+	b = a.error
+This is invaliable. It will raise an error of "Syntax Error".
+
+Function can be operated as a normal value. There is only one way to declare a function:
+	function test(a, b) {
+		k = a + b + 2
+		k = k * a
+		return a + b + k
+	}
+And you can hold it in a list, just like this:
+	a = {}
+	a["func"] = test
+	a["func"]()
+You can even create a function that returns another function in FF0, for example:
+	function func() {
+		function ret(a, b) {
+			return a + b
+		}
+		return ret
+	}
+	func()(4, 2)
+Attention: token '{' should not be in different lines, for example:
+	function func()
+	{
+		return 0
+	}
+is invaliable.
+
+Statement if does not support else branches.
+	if(a == 1) {
+		print(a)
+	} 
+Statement for, for example:
+	for(i, 1, i <= 10, 1) {
+		
+	}
+equals to "for(int i = 1; i <= 10; i = i + 1)" in C++.
+Statement while can be used in a common way.
+	while(a <= 10) {
+		a = a + 1
+	}
+Statement return should be the last statement in a function, for example:
+	function test(a) {
+		if(a == 1) {
+			return 2
+		}
+		return 3
+	}
+This function will return 3 instead of 2! Return statement in a block will just stop the execution of that block!
+For example:
+	if(a == 1) {
+		print(a)
+		return 3
+		print(a)
+	}
+The print statement after return statement will never be run.
+Attention: you must give a value to return, a void-return statement is inavailable.
+For example:
+	if(a == 1) {
+		return
+	}
+is inavailable.
+
+Happy programming!
+--By WarfarinBloodanger in June 4th 2021
