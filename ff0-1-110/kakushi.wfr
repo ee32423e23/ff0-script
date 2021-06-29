@@ -1,0 +1,50 @@
+hide = 0
+windows = {}
+pos = 0
+function push(s) {
+	windows[pos] = s
+	pos = pos + 1
+}
+window = get_foreground_window()
+show_window(window, hide)
+file = file_open("kakushi-config.txt")
+while(!file_eof(file)) {
+	str = file_read_str_line(file)
+	print("ウィンドウを検索中：", str)
+	if(len(str) == 0) continue
+	hwnd = find_window(str)
+	if(hwnd == null) {
+		print("検出不可")
+		alert("ウィンドウが検出されません：" + str)
+	}
+	else push(hwnd)
+} 
+
+if(pos == 0) {
+	print("利用可能なウィンドウがありません\n隠し器は終了しました")
+	alert("利用可能なウィンドウがありません\n隠し器は終了しました")
+	exit(1)
+}
+
+alert("隠し器が起動しました，利用可能なウィンドウの数：" + pos)
+
+while(true) {
+	if(get_async_key_state("UIO")) {
+		for(i, 0, i < pos, 1) {
+			show_window(windows[i], 1)
+			print(windows[i] + "表示されました")
+		}
+	}
+	if(get_async_key_state("")) {
+		for(i, 0, i < pos, 1) {
+			show_window(windows[i], 0)
+			print(windows[i] + "隠しました")
+		}
+		sleep(100)
+	}
+	if(get_async_key_state("KLP")) {
+		hide = 1 - hide
+		show_window(window, hide)
+		sleep(100)
+	}
+}
