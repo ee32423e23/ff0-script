@@ -1,4 +1,4 @@
-lia#include <bits/stdc++.h>
+#include <bits/stdc++.h>
 #ifdef WIN32
 #include <windows.h>
 #endif
