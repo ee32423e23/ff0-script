@@ -1,0 +1,33 @@
+array <- {3, 5, 7, 2 add 3};
+
+Function, called A, needs 3 parameters, called a, must be Number, b, c, do:
+	If a is bigger than b is true, do:
+		If a is bigger than c is true, do: return a; Done;
+		Otherwise, do: return c; Done;
+	Done;
+	Or b is bigger than a is true, do:
+		If b is bigger than c is true, do: return b; Done;
+		Otherwise, do: return c; Done;
+	Done;
+	Or b equals to a is true, do:
+		If b is bigger than c is true, do: return a; Done;
+		Otherwise, do: return c; Done;
+	Done;
+	Otherwise, do:
+		print("Impossible branch.");
+	Done;
+Done;
+
+For i from 0 -> len(array), do:
+	print(array[i]);
+Done;
+print(A(array[0], array[1], array[2]))
+
+a is assigned with 3 add (-3);
+
+Repeat until a is bigger than 10 is false, do:
+	print(a);
+Done;
+
+print("Now will occur an error with code 14")
+print(A("test" add " fake", 4, 5))
