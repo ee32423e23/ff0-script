@@ -1,0 +1,465 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+bool mSpace; //s
+bool mNum;	 //n
+bool mStr;	 //c
+
+const int a = 10;
+const int b = 20;
+const int c = 1001;
+
+string trim(string s) {
+    int x = 0, y = s.length() - 1;
+    while(isspace(s[x])) x++;
+    while(isspace(s[y])) y--;
+    return s.substr(x, y - x + 1);
+}
+
+bool inComment = false;
+
+vector<string> tokenize(string text) {
+	vector<string> vs;
+	string cur = "";
+	for(int i = 0; i < text.length(); i++) {
+		if(text[i] == '\"') {
+			if(cur != "") vs.push_back(cur);
+			cur = "\"";
+			while(i < text.length()) {
+				i++;
+				if(text[i] == '\\') {
+					cur = cur + text[i];
+					if(i < text.length() - 1) {
+						i++;
+						cur = cur + text[i];
+					}
+				}
+				else if(text[i] == '"') {
+					cur = cur + text[i];
+					break;
+				}
+				else cur = cur + text[i];
+			}
+			if(cur != "") vs.push_back(cur);
+			cur = "";
+		}
+		else if(text[i] == '\'') {
+			if(cur != "") vs.push_back(cur);
+			cur = "'";
+			while(i < text.length()) {
+				i++;
+				if(text[i] == '\\') {
+					cur = cur + text[i];
+					if(i < text.length() - 1) {
+						i++;
+						cur = cur + text[i];
+					}
+				}
+				else if(text[i] == '\'') {
+					cur = cur + text[i];
+					break;
+				}
+				else cur = cur + text[i];
+			}
+			if(cur != "") vs.push_back(cur);
+			cur = "";
+		}
+		else if(iscsym(text[i])) {
+			if(cur != "") vs.push_back(cur);
+			cur = "";
+			cur = cur + text[i];
+			while(i < text.length()) {
+				i++;
+				if(!iscsym(text[i])) break;
+				cur = cur + text[i];
+			}
+			i--;
+			if(cur != "") vs.push_back(cur);
+			cur = "";
+		}
+		else if(!iscsym(text[i]) && !isspace(text[i])) {
+			if(cur != "") vs.push_back(cur);
+			cur = "";
+			cur = cur + text[i];
+			while(i < text.length()) {
+				i++;
+				if(iscsym(text[i]) || isspace(text[i]) || text[i] == '\"' || text[i] == '\'' || text[i] == '\0') break;
+				cur = cur + text[i];
+			}
+			i--;
+			if(cur != "") vs.push_back(cur);
+			cur = "";
+		}
+	}
+	
+	vector<string> final; 
+	for(int i = 0; i < vs.size(); i++) {
+		vs[i] = trim(vs[i]);
+		if(vs[i] == "//") break;
+		else if(vs[i] == "/*") {
+			inComment = true;
+		}
+		else if(vs[i] == "*/") {
+			inComment = false;
+		}
+		else if(!inComment) {
+			final.push_back(vs[i]);
+		}
+	}
+	return final;
+}
+
+map<string, string> parse;
+#define TEST
+string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+string prefix = "BlowDusk_";
+
+set<string> basicType;
+set<string> reserved;
+
+string makeName() {
+	stringstream ss("");
+	ss << prefix;
+	for(int i = 0; i < rand() % 10 + 5; i++) ss << chars[rand() % chars.length()];
+	return ss.str();
+}
+
+string getParse(string name) {
+	if(reserved.find(name) != reserved.end() || basicType.find(name) != basicType.end()) return name;
+	if(parse.find(name) == parse.end()) parse[name] = makeName();
+	return parse[name];
+}
+
+string randomSpace();
+
+stringstream funcs("");
+stringstream declares("");
+
+void declare(string name, long double x) {
+	declares << "const" << randomSpace() << "int" << randomSpace() << name << randomSpace() << "=" << randomSpace() << x << randomSpace() << ";" << endl; 
+}
+
+void declareC(string name, char x) {
+	declares << "const" << randomSpace() << "char" << randomSpace() << name << randomSpace() << "=" << randomSpace() << "'" << x << "'" << randomSpace() << ";" << endl; 
+}
+
+void declareF(string name, long double x) {
+	declare(name, x);
+}
+
+string spawnNum(long double x, bool i = false) {
+	stringstream ss("");
+	ss << "(";
+	int diff = rand() % 100;
+	string name = makeName();
+	switch(rand() % (mNum ? 4 : 2)) {
+		case 0: {
+			ss << x - diff << randomSpace() << "+" << randomSpace() << diff;
+			break;
+		}
+		case 1: {
+			ss << x + diff << randomSpace() << "-" << randomSpace() << diff;
+			break;
+		}
+		case 2: {
+			declare(name, diff);
+			ss << x - diff << randomSpace() << "+" << (i ? "(int)" : "") << randomSpace() << name;
+			break;
+			diff = diff % 26;
+			ss << x - diff << randomSpace() << "+" << randomSpace()  << " '" << (char)(diff + 'A') << "'" << (randomSpace()) << "-" << randomSpace() << "'A'";
+			break;
+		}
+		case 3: {
+			declare(name, diff);
+			ss << x - diff << randomSpace() << "+" << (i ? "(int)" : "") << randomSpace() << name;
+			break;
+		}
+		case 4: {
+			diff = diff % 26;
+			diff = diff + 'A';
+			declareC(name, diff);
+			ss << x - diff << randomSpace() << "+ " << randomSpace() << name << " - 'A'";
+			break;
+		}
+	}
+	ss << ")";
+	return ss.str();
+}
+
+int getHex(string hex) {
+	int a = 0;
+	for(int i = 2; i < hex.length(); i++) {
+		int b;
+		if(isdigit(hex[i])) b = hex[i] - '0';
+		else b = hex[i] - 'A' + 10;
+		a = a * 16 + b;
+	}
+	return a;
+}
+
+int getOct(string oct) {
+	int a = 0;
+	for(int i = 1; i < oct.length(); i++) {
+		int b;
+		if(isdigit(oct[i])) b = oct[i] - '0';
+		a = a * 18 + b;
+	}
+	return a;
+}
+
+string getMixExpr(string s) {
+	long double x;
+	if(s[0] == '0') {
+		if(s.length() > 1) {
+			if(s[1] == 'x' || s[1] == 'X') x = getHex(s);
+			else if(s[1] == '.') x = atof(s.c_str());
+			else x = getOct(s);
+		}
+		else x = atof(s.c_str());
+	}
+	else x = atof(s.c_str());
+	stringstream ss("");
+	long double cur = 0;
+	for(int i = 1; i < rand() % 5; i++) {
+		int r = rand() % 500;
+		cur = cur + r;
+		ss << randomSpace() << spawnNum(r) << randomSpace() << "+";
+	}
+	
+	long double diff = cur - x;
+	ss << randomSpace() << "-" << randomSpace() << spawnNum(diff);
+	
+	return "(" + ss.str()  + ")";
+}
+
+string getStrExpr(string s) {
+	if(!mStr) return s;
+	if(s[0] == '\'') {
+		char buffer[25];
+		s = s.substr(1, s.length() - 2);
+		if(s == "\\0") return "('\\0')";
+		sprintf(buffer, s.c_str());
+		return spawnNum(buffer[0]);
+	}
+	s = s.substr(1, s.length() - 2);
+	string name = makeName();
+	funcs << "char" << randomSpace() << "*" << randomSpace() << name << randomSpace() << "(" << randomSpace() << "int" << randomSpace() << makeName() << randomSpace() << ")" << randomSpace() << "{" << endl;
+	string sname = makeName();
+	funcs << "char" << randomSpace() << "*" << randomSpace() << sname << randomSpace() << "=" << randomSpace() << "new" << randomSpace() << "char" << randomSpace();
+	funcs << "[" << randomSpace() << spawnNum(s.length(), true) << randomSpace() << " + 1]" << randomSpace() << ";";
+	for(int i = 0; i < s.length(); i++) {
+		funcs << sname << randomSpace() << "[" << randomSpace() << spawnNum(i, true) << randomSpace() << "]" << randomSpace() << "=" << randomSpace() << spawnNum(s[i], true) << randomSpace() << ";"; 
+	}
+	funcs << sname << randomSpace() << "[" << randomSpace() << spawnNum(s.length(), true) << randomSpace() << "]" << randomSpace() << "=" << randomSpace() << "'\\0'" << randomSpace() << ";";
+	funcs << "return" << randomSpace() << sname << randomSpace() << ";" << endl;
+	funcs << "}";
+	return "(" + randomSpace() + name + randomSpace() + "(" + randomSpace() + spawnNum(rand() % 1000) + ")" + ")";
+}
+
+string getCurParse(string name) {
+	if(isdigit(name[0])) return getMixExpr(name);
+	else if(iscsym(name[0]) || name[0] == '_') {
+		if(reserved.find(name) != reserved.end() || basicType.find(name) != basicType.end()) return name;
+		if(parse.find(name) == parse.end()) return name;
+		return parse[name];
+	}
+	else if(name[0] == '\"' || name[0] == '\'') return getStrExpr(name);
+	else return name;
+	return name;
+}
+
+string space[3] = {
+	" ", "    ", "\n"
+};
+
+string randomSpace() {
+	if(!mSpace) return " ";
+	stringstream ss("");
+	ss << " ";
+	for(int i = 1; i < rand() % 10 + 1; i++) {
+		int index = rand() % 4;
+		if(index < 3) ss << space[index];
+		else {
+			ss << "/*";
+			for(int i = 5; i <= rand() % 20 + 5; i++) {
+				if(rand() % 5 == 0) ss << space[rand() % 3];
+				else ss << chars[rand() % chars.length()];
+			}
+			ss << "*/";
+		}
+	}
+	return ss.str();
+}
+
+void init() {
+	basicType.insert("int"); 
+	basicType.insert("double"); 
+	basicType.insert("long"); 
+	basicType.insert("char"); 
+	basicType.insert("float"); 
+	basicType.insert("bool");
+	reserved.insert("main");
+	reserved.insert("class");
+	reserved.insert("typedef");
+	reserved.insert("if");
+	reserved.insert("for");
+	reserved.insert("while");
+	reserved.insert("void");
+	reserved.insert("return");
+	reserved.insert("break");
+	reserved.insert("continue");
+	reserved.insert("else");
+	reserved.insert("do");
+}
+
+int getStrCnt(string s, char c) {
+	int n = 0;
+	if(s[0] == '\"' || s[0] == '\'') return 0;
+	for(int i = 0; i < s.length(); i++) if(s[i] == c) n++;
+	return n;
+}
+
+string mix(string text) {
+	if(text[0] == '#') return text;
+	vector<string> vs = tokenize(text);
+	if(vs.size() == 0) {
+		return "/**/";
+	}
+	stringstream mixed("");
+	if(basicType.find(vs[0]) != basicType.end() || vs[0] == "unsigned" || vs[0] == "const" || (vs.size() >= 2 && getStrCnt(vs[1], '<'))) {
+		int i = 1;
+		bool templ = false;
+		if(vs.size() >= 2 && getStrCnt(vs[1], '<')) {
+			int top = getStrCnt(vs[1], '<');
+			int backup = i;
+			templ = true;
+			mixed << vs[0] << randomSpace() << vs[1] << randomSpace();
+			while(top > 0 && i < vs.size() - 1) {
+				i++;
+				top = top + getStrCnt(vs[i], '<') - getStrCnt(vs[i], '>');
+			}
+			if(top > 0) { //Failed bcuz '<<'
+				i = backup;
+				templ = false;
+				for(int ix = i + 1; ix < vs.size(); ix++) mixed << getCurParse(vs[ix]) << randomSpace();
+				return mixed.str();
+			}
+			else {
+				for(int x = backup + 1; x <= i; x++) mixed << getCurParse(vs[x]) << randomSpace();
+			}
+		}
+		else if(vs[0] == "unsigned") {
+			mixed << "unsigned ";
+			i++;
+		}
+		
+		if(!templ) {
+			if(vs[0] == "long") {
+				mixed << "long" << randomSpace();
+				i++;
+				mixed << vs[1] << randomSpace();
+			}
+			else mixed << vs[0] << randomSpace();
+			while(!iscsym(vs[i][0])) {
+				mixed << getCurParse(vs[i]) << randomSpace();
+				i++;
+			}
+		}
+		
+		if(i >= vs.size() - 1) {
+			return "/*Parse Failed.*/";
+		}
+		if(!templ) mixed << getParse(vs[i]) << randomSpace();
+		else {
+			i++;
+			mixed << getParse(vs[i]) << randomSpace();
+		}
+		i++;
+		
+		int inq[3] = {0, 0, 0};
+		
+		for(i; i < vs.size(); i++) {
+			bool work = false;
+			if(vs[i][0] == '\"' || vs[i][0] == '\'');
+			else for(int j = 0; j < vs[i].length(); j++) {
+				if(vs[i][j] == '(') inq[0]++; 
+				if(vs[i][j] == ')') inq[0]--; 
+				if(vs[i][j] == '[') inq[1]++; 
+				if(vs[i][j] == ']') inq[1]--; 
+				if(vs[i][j] == '{') inq[2]++; 
+				if(vs[i][j] == '}') inq[2]--; 
+ 				if(vs[i][j] == ',' && !(inq[0] || inq[1] || inq[2])) {
+					work = true;
+					if(i >= vs.size() - 1) {
+						return "/*Parse Failed.*/";
+					}
+					mixed << vs[i] << randomSpace() << getParse(vs[i + 1]) << randomSpace();
+					i++;
+				}
+			}
+			if(!work && inq[0]) { //function call
+				if(basicType.find(vs[i]) != basicType.end() || vs[i] == "unsigned") { //parameter declare
+					if(vs[i] == "unsigned") {
+						mixed << "unsigned ";
+						i++;
+					}
+					if(vs[i] == "long") {
+						mixed << "long long ";
+						i++;
+					}
+					else mixed << vs[i] << randomSpace();
+					i++;
+					while(i < vs.size()) {
+						if(iscsym(vs[i][0])) break;
+						mixed << getCurParse(vs[i]) << randomSpace();
+						i++;
+					}
+					mixed << getParse(vs[i]) << randomSpace();
+				}
+				else mixed << getCurParse(vs[i]) << randomSpace();
+			}
+			else if(!work) mixed << getCurParse(vs[i]) << randomSpace();
+		}
+	}
+	else if(vs[0] == "typedef") {
+		if(vs[1] != "struct" && vs.size() == 4) {
+			mixed << "typedef " << getParse(vs[1]) << " " << getParse(vs[2]) << " ;";
+			basicType.insert(vs[2]);
+		}
+		else for(int i = 0; i < vs.size(); i++) mixed << getCurParse(vs[i]) << randomSpace();
+	}
+	else if(vs[0] == "class") {
+		for(int i = 0; i < vs.size(); i++) {
+			if(isalpha(vs[i][0]) || vs[i][0] == '_') mixed << getParse(vs[i]) << randomSpace();
+			else if(isdigit(vs[i][0])) mixed << getMixExpr(vs[i]) << randomSpace();
+			else mixed << getCurParse(vs[i]) << randomSpace();
+		}
+	}
+	else for(int i = 0; i < vs.size(); i++) mixed << getCurParse(vs[i]) << randomSpace();
+	return mixed.str();
+}
+
+int main(int argc, char ** argv) {
+	init();
+	if(argc == 2) {
+		for(int i = 1; i < ((string)(argv[1])).length(); i++) {
+			if(argv[1][i] == 's') mSpace = true;
+			if(argv[1][i] == 'n') mNum = true;
+			if(argv[1][i] == 'c') mStr = true;
+		}
+	}
+	srand(time(NULL));
+	vector<string> codes;
+	string s;
+	while(getline(cin, s)) {
+		s = trim(s);
+		if(s != "") codes.push_back(s);
+	}
+	stringstream mixed("");
+	for(int i = 0; i < codes.size(); i++) mixed << mix(codes[i]) << endl;
+	cout << declares.str() << endl;
+	cout << funcs.str() << endl;
+	cout << mixed.str() << endl;
+}
