@@ -1,0 +1,24 @@
+function sort(left, right, list, cmp:Closure) {
+	if(left >= right) return null
+	local i, j, x
+	i = left
+	j = right
+	x = list[left]
+	while(i < j) {
+		while(cmp(x, list[j]) && i < j) j = j - 1
+		while(cmp(list[i], x) && i < j) i = i + 1
+		if(i < j) {
+			tmp = list[i]
+			list[i] = list[j]
+			list[j] = tmp
+		}
+	}
+	list[left] = list[i]
+	list[j] = x
+	sort(left, i - 1, list, cmp)
+	sort(i + 1, right, list, cmp)
+}
+
+function smaller_int(a, b) {
+	return a <= b
+}
