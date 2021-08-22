@@ -1,0 +1,56 @@
+# algorithm.wfr
+# All rights are reserved.
+
+# Sort the list given from left to right with the comparing rule that defined in function cmp.
+# This function will change the value of paremeter 'list'.
+# In FF0Script, parameters are all spread-by-ref.
+# No other return values but null.
+# left: begin position
+# right: end position
+# list: ref to be sorted
+# cmp: must be Closure, a function that takes exactly 2 parameters, which should be able to compare two elements given 
+function sort(left, right, list, cmp:Closure) {
+	if(left >= right) return null
+	local i, j, x
+	i = left
+	j = right
+	x = list[left]
+	while(i < j) {
+		while(cmp(x, list[j]) && i < j) j = j - 1
+		while(cmp(list[i], x) && i < j) i = i + 1
+		if(i < j) {
+			tmp = list[i]
+			list[i] = list[j]
+			list[j] = tmp
+		}
+	}
+	list[left] = list[i]
+	list[j] = x
+	sort(left, i - 1, list, cmp)
+	sort(i + 1, right, list, cmp)
+}
+
+# A tool function that compares two Number in operation less-equal.
+# You can call the function 'sort' with this function
+# e.g. sort(L, R, arr, smaller_int)
+# a: Number
+# b: Number
+function smaller_int(a, b) {
+	print("a = " + a + " b = " + b)
+	return a <= b
+}
+
+# Calculate a^b quickly.
+# a: Number
+# b: Number
+function quick_pow(a, b) {
+	local ans, base
+	ans = 1
+	base = a
+	while(b != 0) {
+		if((b & 1) != 0) ans = ans * base
+		base = base * base
+		b = b >> 1
+	}
+	return ans
+}
