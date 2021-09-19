@@ -1,19 +1,26 @@
 3-91
-# ff0-script
-一个运行自制脚本语言的解释器
-当前版本：3.91
+# FF0Script
+
+## 简称 FScript
+
+一门自制的脚本语言，使用 C++ 实现。
+当前版本：3.91。
+
+更新日志：
+
+- 3.91 版本：加入大整数 BigNum 类型，会在 Number 溢出时自动转换成高精度，**可能会丢失小数部分**。另外，使用 `big("123456789")` 也可以生成一个高精度整数。
 
 ```
 （如果有JavaScript编程经验的程序员可能会更好上手Warfarin语言）
 
 运行方式：
 
-（1.6版本的Warfarin是交互解释器、编译器和虚拟机分开的三个exe，1.7之后正式三合一） 
+（1.6版本的FScript是交互解释器、编译器和虚拟机分开的三个exe，1.7之后正式三合一） 
 
-直接打开Warfarin可启动交互解释器，按Ctrl+Z停止输入并观察程序输出。
+直接打开FScript可启动交互解释器，按Ctrl+Z停止输入并观察程序输出。
 
 也可使用命令行完成操作，格式：
-Warfarin <文件名> <参数列表>
+FScript <文件名> <参数列表>
 
 参数列表：
 -c 是否编译出.ff0文件 
@@ -22,9 +29,9 @@ Warfarin <文件名> <参数列表>
 -p 是否启动伪代码分析器 FF0Parser
 
 例：
-Warfarin test.wfr -cr 编译并运行test.wfr文件
-Warfarin test.wfr -crj 把test.wfr文件编译并运行，同时反编译成JavaScript
-Warfarin test.wfr -crjp 把test.wfr文件编译运行反编译，允许代码中含有伪代码
+FScript test.wfr -cr 编译并运行test.wfr文件
+FScript test.wfr -crj 把test.wfr文件编译并运行，同时反编译成JavaScript
+FScript test.wfr -crjp 把test.wfr文件编译运行反编译，允许代码中含有伪代码
 
 如果使用交互解释器，将会在当前目录下生成一个a.ff0文件。 
 
@@ -38,7 +45,7 @@ import 完整文件名
     b = a + 1
     c = a + b
 任何一个变量在没有初始化时均为undefined类型。
-2.Warfarin支持四种类型的数据：
+2.FScript支持四种类型的数据：
    数字（IEEE浮点数，即C++中的double） a = 42.24
    字符串                              b = "Surtr"
    列表                                   c = {"1", 2, {"another list"}}
@@ -116,7 +123,7 @@ import 完整文件名
     a["test"] = abs
     a["test"](5)
 
-    为了程序更简洁明了，Warfarin允许使用a.test这样的“点语法”进行访问。
+    为了程序更简洁明了，FScript允许使用a.test这样的“点语法”进行访问。
 
 6.一些常用函数（可在源代码的init函数中找到1.7版本所有的内置函数）
     print("Hello")  打印（你可以print(a, b, c)）
@@ -128,7 +135,7 @@ import 完整文件名
     read_string()   从控制台读入一个字符串（不允许有空格）
     read_str_line() 从控制台读入一行字符串（允许有空格）
     random()        得到一个随机数，范围在[0, 32768]
-    warfarin()      得到当前Warfarin虚拟机的版本信息
+    warfarin()      得到当前FScript虚拟机的版本信息
     alert("ERROR")  弹出一个对话框并返回用户的输入 *在信竞版本不可用
     xor(2, 3)       计算2与3的异或
      readonly("a")   把a变成只读的
@@ -141,10 +148,10 @@ import 完整文件名
     运行以上程序就会发生这种错误。你必须给所有元素初始化后才能使用它们。
 
     (II) variable ';' is not declared
-    不要在语句后面加分号。Warfarin强制要求不加。 
+    不要在语句后面加分号。FScript强制要求不加。 
 ```
 
-## 伪代码转 Warfarin 语言 FF0Parser 使用方式：
+## 伪代码转 FScript 语言 FF0Parser 使用方式：
 
 ```
 使用方式：直接运行程序，输入源代码，使用 Ctrl+Z 停止输入后即可获得输出。
@@ -170,7 +177,7 @@ Done;
 Otherwise, do:
 	<代码> 
 Done;
-等同于 Warfarin 中的
+等同于 FScript 中的
 if(...) {
 	...
 } 
@@ -216,6 +223,8 @@ Function, called B, needs 2 parameters, called p1, p2, do:
 ...
 5. 其他
 一行里面可以写多条语句，但是必须用分号 ; 分隔。
-转化成的代码是 Warfarin 格式。如果要转成 JavaScript 可以使用 Warfarin 虚拟机自带的反编译功能反编译成 JavaScript 代码。
+转化成的代码是 FScript 格式。如果要转成 JavaScript 可以使用 FScript 虚拟机自带的反编译功能反编译成 JavaScript 代码。
 All rights are reserved. 
+```
+
 ```
