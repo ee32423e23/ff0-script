@@ -1,7 +1,10 @@
 3-91
 # FF0Script
-
 ## 简称 FScript
+
+# 本仓库已经停止更新，此处的最新版本 3.91，4.0 以上的版本请到 RBQscript 仓库里面去下载源代码。
+
+[RBQScript 链接](https://github.com/WarfarinBloodanger/rbqscript)
 
 一门自制的脚本语言，使用 C++ 实现。
 当前版本：3.91。
